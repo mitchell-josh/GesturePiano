@@ -1,0 +1,8 @@
+cffi==1.11.4
+numpy==1.14.0
+opencv-python==3.4.0.12
+pycparser==2.18
+pygame==1.9.3
+PyQt5==5.10
+samplerate==0.1.0
+sip==4.19.7
