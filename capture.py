@@ -2,6 +2,8 @@ import logging
 
 import cv2 as cv
 
+import processing
+
 
 class FrameProcessor:
     def __init__(self, frame):
@@ -10,8 +12,11 @@ class FrameProcessor:
     def process(self):
         if self.frame is not None:
             # do image process stuffs here
+            image_processor = processing.ImageProcessor(self.frame)
+            self.frame = image_processor.simple_binary(167)
+
             self.frame = cv.flip(self.frame, 1)
-            self.frame = cv.cvtColor(self.frame, cv.COLOR_BGR2RGB)
+            self.frame = cv.cvtColor(self.frame, cv.COLOR_GRAY2BGR)
 
 
 class VideoStream:
