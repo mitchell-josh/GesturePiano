@@ -69,7 +69,6 @@ class Canny:
                         if (frame[x, y] >= frame[x - 1, x + 1]) and (frame[x, y] >= frame[x + 1, x - 1]):
                             z[x, y] = frame[x, y]
                 except IndexError as e:
-                    """ Todo: Deal with pixels at the image boundaries. """
                     pass
 
         return z
