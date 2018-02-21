@@ -6,3 +6,4 @@ pygame==1.9.3
 PyQt5==5.10
 samplerate==0.1.0
 sip==4.19.7
+scipy==1.0.0
