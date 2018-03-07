@@ -7,7 +7,7 @@ from scipy import ndimage
 
 class ImageProcessor:
     def __init__(self, frame):
-        self.frame = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
+        self.frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
     """
     Implements OpenCV simple threshold methods
