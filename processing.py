@@ -20,31 +20,37 @@ class ImageProcessor:
         return thresh
 
     def simple_binary_inv(self, val):
-        ret, thresh = cv.threshold(self.frame, val, 255, cv.THRESH_BINARY_INV)
+        frame = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
+        ret, thresh = cv.threshold(frame, val, 255, cv.THRESH_BINARY_INV)
         return thresh
 
     def simple_trunc(self, val):
-        ret, thresh = cv.threshold(self.frame, val, 255, cv.THRESH_TRUNC)
+        frame = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
+        ret, thresh = cv.threshold(frame, val, 255, cv.THRESH_TRUNC)
         return thresh
 
     def simple_tozero(self, val):
-        ret, thresh = cv.threshold(self.frame, val, 255, cv.THRESH_TOZERO)
+        frame = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
+        ret, thresh = cv.threshold(frame, val, 255, cv.THRESH_TOZERO)
         return thresh
 
     def simple_tozero_inv(self, val):
-        ret, thresh = cv.threshold(self.frame, val, 255, cv.THRESH_TOZERO_INV)
+        frame = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
+        ret, thresh = cv.threshold(frame, val, 255, cv.THRESH_TOZERO_INV)
         return thresh
 
     """
     Implements OpenCV adaptive threshold methods
     """
     def adaptive_mean(self):
-        thresh = cv.adaptiveThreshold(self.frame, 255, cv.ADAPTIVE_THRESH_MEAN_C,
+        frame = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
+        thresh = cv.adaptiveThreshold(frame, 255, cv.ADAPTIVE_THRESH_MEAN_C,
                                       cv.THRESH_BINARY, 11, 2)
         return thresh
 
     def adaptive_gaussian(self):
-        thresh = cv.adaptiveThreshold(self.frame, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C,
+        frame = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
+        thresh = cv.adaptiveThreshold(frame, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C,
                                       cv.THRESH_BINARY, 11, 2)
         return thresh
 
