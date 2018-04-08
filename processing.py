@@ -1,19 +1,22 @@
 import cv2 as cv
 import numpy as np
 import canny
+import itertools as IT
 
 from scipy import ndimage
 
 
 class ImageProcessor:
     def __init__(self, frame):
-        self.frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        self.frame = frame
+
 
     """
     Implements OpenCV simple threshold methods
     """
     def simple_binary(self, val):
-        ret,thresh = cv.threshold(self.frame, val, 255, cv.THRESH_BINARY)
+        frame = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
+        ret,thresh = cv.threshold(frame, val, 255, cv.THRESH_BINARY)
         return thresh
 
     def simple_binary_inv(self, val):
@@ -76,51 +79,53 @@ class ImageProcessor:
                 min_func = within_class_variance;
                 thresh = i
 
-        # Returns the optimum threshold value
-        return thresh
+        # Returns the binary frame
+        return self.simple_binary(thresh)
 
 
     """
     Performs edge detection on processed image
     """
-    def sobel_edge(self):
-        k_x = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], np.int32)
-        k_y = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]], np.int32)
+    def sobel_edge(self, frame):
+        cv.imwrite("test2.jpg", frame)
 
-        Ix = ndimage.convolve(self.frame, k_x)
-        Iy = ndimage.convolve(self.frame, k_y)
+        Ix = cv.Sobel(frame,cv.CV_64F,1,0,ksize=5)
+        Iy = cv.Sobel(frame,cv.CV_64F,0,1,ksize=5)
 
         frame = np.hypot(Ix, Iy)
+        frame *= 255.0 / np.max(frame)
 
         return frame
 
+    """
+    Canny edge detection on image
+    """
     def canny(self):
-        result = canny.Canny(self.frame, 200, 100)
+        frame = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
+        result = canny.Canny(frame, 200, 100)
         return result.process()
 
 
     """
     Note: Do not call this method unless input is a binary image
     """
-    def simple_edge(self):
-        # TODO: Refactor to kernels for optimisation
-        height, width = self.frame.shape
-        new_img = np.zeros((height, width, 1), np.float64)
+    def simple_edge(self, frame):
+        height, width = frame.shape
+        new_img = np.zeros((height, width), np.uint8)
 
-        for x in range(1, (width-1)):
-            for y in range(1, (height-1)):
-
-                if ((self.frame[x + 1, y] - self.frame[x - 1, y] == 255)
-                    or (self.frame[x + 1, y] - self.frame[x - 1, y] == 255)):
-                    new_img[x, y] = 255
-                elif (self.frame[x, y + 1] - self.frame[x, y - 1]) == 255:
-                    new_img[x, y] = 255
-                elif (self.frame[x, y + 1] - self.frame[x, y - 1]) == -255:
-                    new_img[x, y] = 255
-                else:
-                    new_img[x, y] = 0
+        for x in range(width):
+            for y in range(height):
+                try:
+                    if (frame[x + 1, y] - frame[x - 1, y] == 255) or (frame[x + 1, y] - frame[x - 1, y] == 255) or (
+                            frame[x, y + 1] - frame[x, y - 1] == 255) or (frame[x, y + 1] - frame[x, y - 1] == -255):
+                        new_img[x, y] = 255
+                    else:
+                        new_img[x, y] = 0
+                except IndexError as e:
+                    pass
 
         return new_img
+
 
 
 

@@ -94,7 +94,6 @@ class Canny:
 
         for x in range(width):
             for y in range(height):
-                print(frame[x, y])
                 if frame[x, y] == 50:
                     try:
                         if ((frame[x + 1, y] == 255) or (frame[x - 1, y] == 255)

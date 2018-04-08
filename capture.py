@@ -8,12 +8,11 @@ import processing
 class FrameProcessor:
     def __init__(self, frame):
         self.frame = frame
+        self.image_processor = processing.ImageProcessor(frame)
 
     def process(self):
         if self.frame is not None:
             # do image process stuffs here
-            image_processor = processing.ImageProcessor(self.frame)
-            self.frame = image_processor.simple_binary(167)
 
             self.frame = cv.flip(self.frame, 1)
             self.frame = cv.cvtColor(self.frame, cv.COLOR_GRAY2BGR)
