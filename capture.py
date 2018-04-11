@@ -5,19 +5,6 @@ import cv2 as cv
 import processing
 
 
-class FrameProcessor:
-    def __init__(self, frame):
-        self.frame = frame
-        self.image_processor = processing.ImageProcessor(frame)
-
-    def process(self):
-        if self.frame is not None:
-            # do image process stuffs here
-
-            self.frame = cv.flip(self.frame, 1)
-            self.frame = cv.cvtColor(self.frame, cv.COLOR_GRAY2BGR)
-
-
 class VideoStream:
     def __init__(self):
         self.cap = cv.VideoCapture(0)
@@ -37,10 +24,12 @@ class VideoStream:
     def get_next_frame(self):
         frame = self.get_next_frame_raw()
 
-        frame_processor = FrameProcessor(frame)
-        frame_processor.process()
+        image_processor = processing.ImageProcessor(frame)
+        frame = image_processor.simple_binary(157)
 
-        frame = frame_processor.frame
+        frame = cv.flip(frame, 1)
+        frame = cv.cvtColor(frame, cv.COLOR_GRAY2BGR)
+
         return frame
 
     def is_open(self):

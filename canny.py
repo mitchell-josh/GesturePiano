@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from scipy import ndimage
 
+
 class Canny:
 
     def __init__(self, frame, upperThresh, lowerThresh):
@@ -97,8 +98,8 @@ class Canny:
                 if frame[x, y] == 50:
                     try:
                         if ((frame[x + 1, y] == 255) or (frame[x - 1, y] == 255)
-                            or (frame[x, y + 1] == 255) or (frame[x, y - 1]) == 255
-                            or (frame[x + 1, y + 1] == 255) or (frame[x - 1, y - 1] == 255)):
+                                or (frame[x, y + 1] == 255) or (frame[x, y - 1]) == 255
+                                or (frame[x + 1, y + 1] == 255) or (frame[x - 1, y - 1] == 255)):
                             frame[x, y] = 255
                         else:
                             frame[x, y] = 0
