@@ -40,6 +40,7 @@ class Piano:
         else:
             self.octave_count = octave_count
             self.note_dict = generate_octaves(octave_count)
+            self.channel = pygame.mixer.Channel(5)
 
     def is_valid_note(self, note):
         if note[0] not in WHITE_KEYS and note not in BLACK_KEYS or int(note[-1]) not in range(1, self.octave_count + 1):
@@ -49,14 +50,16 @@ class Piano:
 
     def play(self, note):
         if self.is_valid_note(note):
-            self.note = note
-            self.note_dict[self.note].play()
+            self.channel.play(self.note_dict[note])
 
         else:
             logging.error("Invalid note: " + note)
 
+    def is_note_playing(self):
+        return self.channel.get_busy()
+
     def stop(self):
-        self.note_dict[self.note].stop()
+        self.channel.stop()
 
 
 

@@ -19,7 +19,7 @@ class VideoStream:
         return frame
 
     """
-        Returns an Image Frame processed by Frame Processor
+        Returns processed image frame
     """
     def get_next_frame(self):
         frame = self.get_next_frame_raw()

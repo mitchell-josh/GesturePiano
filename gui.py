@@ -32,11 +32,16 @@ class LogTextEdit(logging.Handler):
 
 
 class UpdateThread(QThread):
-    pix_map_signal = pyqtSignal(QPixmap)
+    signal_lbl_cam = pyqtSignal(QPixmap)
+    signal_lbl_piano = pyqtSignal(QPixmap)
 
     def __init__(self, parent=None):
         QThread.__init__(self, parent=parent)
         self.stream = capture.VideoStream()
+        self.piano = piano.Piano(4)  # 4 - number of octaves
+
+        self.is_demo_piano = True
+        self.is_pianolbl_reset = True
         self.is_running = True
         logging.debug("UpdateThread Initialized")
 
@@ -53,13 +58,30 @@ class UpdateThread(QThread):
             # Change to stream.get_next_frame_raw() for raw Image from camera
             frame = self.stream.get_next_frame()
 
+            # Piano demo
+            # if ai.is_valid_gesture(frame):
+            if self.is_demo_piano is True:
+                # note = ai.get_note()
+                note = 'C-1'
+                self.piano.play(note)
+                self.signal_lbl_piano.emit(QPixmap("res/" + note.split("-")[0].lower() + "_down.png").scaledToWidth(520))
+                logging.debug("Piano label updated to res/" + note[0].lower() + "_down.png")
+
+                self.is_pianolbl_reset = False
+                self.is_demo_piano = False
+
+            # reset key label if the note is no longer being played
+            if not self.is_pianolbl_reset and not self.piano.is_note_playing():
+                self.signal_lbl_piano.emit(QPixmap("res/keys.png").scaledToWidth(520))
+                logging.debug("Piano label reset to res/keys.png")
+                self.is_pianolbl_reset = True
+
             # Convert image
             image = QImage(frame.data, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
             image = QPixmap.fromImage(image)
 
-            # TODO: change rescale size dynamically as gui gets stretched
             rescaled_image = image.scaled(520, 360, Qt.KeepAspectRatio)
-            self.pix_map_signal.emit(rescaled_image)
+            self.signal_lbl_cam.emit(rescaled_image)
 
         logging.debug("UpdateImage Thread out of loop")
 
@@ -83,15 +105,16 @@ class GUI(QWidget):
         self.lbl_keys.setPixmap(QPixmap("res/keys.png").scaledToWidth(520))
         self.lbl_keys.resize(520, 360)
 
-        self.thread = UpdateThread(self)
-        self.thread.pix_map_signal.connect(self.lbl_image.setPixmap)
-        self.thread.start()
-
         logger = LogTextEdit(self)
         logging.getLogger().addHandler(logger)
         logger.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] - %(message)s", "%d/%m/%y %H:%M:%S"))
         logging.getLogger().addHandler(logger)
         logging.getLogger().setLevel(LOG_LEVEL)
+
+        self.thread = UpdateThread(self)
+        self.thread.signal_lbl_cam.connect(self.lbl_image.setPixmap)
+        self.thread.signal_lbl_piano.connect(self.lbl_keys.setPixmap)
+        self.thread.start()
 
         self.inner_layout.addWidget(self.lbl_image)
         self.inner_layout.addWidget(self.lbl_keys)
@@ -100,12 +123,6 @@ class GUI(QWidget):
         self.layout.addWidget(logger.widget)
 
         self.setLayout(self.layout)
-
-        # Demo play notes, use in the ai class
-        self.piano = piano.Piano(4) # 4 - number of octaves
-        self.piano.play('C-1') # format: 'note-octave'
-
-        # self.piano.stop() call this in the ai when the user stops the gesture
 
         logging.debug("GUI Initialized")
 
