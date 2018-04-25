@@ -3,7 +3,6 @@ import logging
 import pygame
 from samplerate import resample
 
-SF2 = 'res/piano.sf2'
 MAX_OCTAVE = 7
 WHITE_KEYS = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
 BLACK_KEYS = ['C#', 'D#', 'F#', 'G#', 'A#']
@@ -43,17 +42,13 @@ class Piano:
             self.channel = pygame.mixer.Channel(5)
 
     def is_valid_note(self, note):
-        if note[0] not in WHITE_KEYS and note not in BLACK_KEYS or int(note[-1]) not in range(1, self.octave_count + 1):
+        if not note or note[0] not in WHITE_KEYS and note not in BLACK_KEYS or int(note[-1]) not in range(1, self.octave_count + 1):
             return False
 
         return True
 
     def play(self, note):
-        if self.is_valid_note(note):
             self.channel.play(self.note_dict[note])
-
-        else:
-            logging.error("Invalid note: " + note)
 
     def is_note_playing(self):
         return self.channel.get_busy()

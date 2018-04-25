@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import QWidget
 
 import capture
 import piano
+import ai
 
 LOG_LEVEL = logging.DEBUG
 app = QApplication(sys.argv)
@@ -39,8 +40,8 @@ class UpdateThread(QThread):
         QThread.__init__(self, parent=parent)
         self.stream = capture.VideoStream()
         self.piano = piano.Piano(4)  # 4 - number of octaves
+        self.ai = ai.AI()
 
-        self.is_demo_piano = True
         self.is_pianolbl_reset = True
         self.is_running = True
         logging.debug("UpdateThread Initialized")
@@ -59,16 +60,13 @@ class UpdateThread(QThread):
             frame = self.stream.get_next_frame()
 
             # Piano demo
-            # if ai.is_valid_gesture(frame):
-            if self.is_demo_piano is True:
-                # note = ai.get_note()
-                note = 'C-1'
+            note = self.ai.detect_gesture(frame)
+            if self.piano.is_valid_note(note):
                 self.piano.play(note)
                 self.signal_lbl_piano.emit(QPixmap("res/" + note.split("-")[0].lower() + "_down.png").scaledToWidth(520))
                 logging.debug("Piano label updated to res/" + note[0].lower() + "_down.png")
 
                 self.is_pianolbl_reset = False
-                self.is_demo_piano = False
 
             # reset key label if the note is no longer being played
             if not self.is_pianolbl_reset and not self.piano.is_note_playing():

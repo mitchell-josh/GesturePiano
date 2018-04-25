@@ -92,16 +92,15 @@ class ImageProcessor:
     """
     Performs edge detection on processed image
     """
-    def sobel_edge(self, frame):
-        cv.imwrite("test2.jpg", frame)
+    def sobel_edge(self):
 
-        Ix = cv.Sobel(frame,cv.CV_64F,1,0,ksize=5)
-        Iy = cv.Sobel(frame,cv.CV_64F,0,1,ksize=5)
+        Ix = cv.Sobel(self.frame,cv.CV_64F,1,0,ksize=5)
+        Iy = cv.Sobel(self.frame,cv.CV_64F,0,1,ksize=5)
 
         frame = np.hypot(Ix, Iy)
-        frame *= 255.0 / np.max(frame)
+        frame *= 255.0 / np.max(self.frame)
 
-        return frame
+        return self.frame
 
     """
     Canny edge detection on image
@@ -115,7 +114,8 @@ class ImageProcessor:
     """
     Note: Do not call this method unless input is a binary image
     """
-    def simple_edge(self, frame):
+    def simple_edge(self):
+        frame = self.frame
         height, width = frame.shape
         new_img = np.zeros((height, width), np.uint8)
 
