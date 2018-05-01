@@ -95,6 +95,7 @@ class UpdateThread(QThread):
 
 class GUI(QWidget):
     def __init__(self, window_title='Virtual Piano'):
+        self.is_debug_view = True
         QWidget.__init__(self)
         self.setWindowTitle(window_title)
         self.layout = QVBoxLayout()
@@ -104,7 +105,8 @@ class GUI(QWidget):
         self.lbl_image.resize(520, 320)
 
         self.combo_box = QComboBox(self)
-        self.combo_box.addItem("Image processing - [Toggle]")
+        self.combo_box.addItem("[Toggle] - Image processing")
+        self.combo_box.addItem("[Toggle] - Display debug logs")
         self.combo_box.addItem("Piano - C")
         self.combo_box.addItem("Piano - C#")
         self.combo_box.addItem("Piano - D")
@@ -122,10 +124,10 @@ class GUI(QWidget):
         self.lbl_keys.setPixmap(QPixmap("res/keys.png").scaledToWidth(520))
         self.lbl_keys.resize(520, 360)
 
-        logger = LogTextEdit(self)
-        logging.getLogger().addHandler(logger)
-        logger.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] - %(message)s", "%d/%m/%y %H:%M:%S"))
-        logging.getLogger().addHandler(logger)
+        self.logger = LogTextEdit(self)
+        logging.getLogger().addHandler(self.logger)
+        self.logger.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] - %(message)s", "%d/%m/%y %H:%M:%S"))
+        logging.getLogger().addHandler(self.logger)
         logging.getLogger().setLevel(LOG_LEVEL)
 
         self.thread = UpdateThread(self)
@@ -139,7 +141,7 @@ class GUI(QWidget):
 
         self.layout.addLayout(self.inner_layout)
         self.layout.addWidget(self.combo_box)
-        self.layout.addWidget(logger.widget)
+        self.layout.addWidget(self.logger.widget)
 
         self.setLayout(self.layout)
 
@@ -150,8 +152,12 @@ class GUI(QWidget):
             self.thread.piano.stop()
             self.thread.piano.play(text.replace("Piano - ", "") + "-1")
 
-        elif "Image processing - [Toggle]" in text:
+        elif "Image processing" in text:
             self.thread.is_image_processing_demo = not self.thread.is_image_processing_demo
+
+        elif "debug logs" in text:
+            self.is_debug_view = not self.is_debug_view
+            self.logger.widget.setVisible(self.is_debug_view)
 
     def closeEvent(self, event):
         self.thread.stop()
