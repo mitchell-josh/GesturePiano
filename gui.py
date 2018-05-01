@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QPlainTextEdit
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QComboBox
 
 import capture
 import piano
@@ -42,6 +43,7 @@ class UpdateThread(QThread):
         self.piano = piano.Piano(4)  # 4 - number of octaves
         self.ai = ai.AI()
 
+        self.is_image_processing_demo = True
         self.is_pianolbl_reset = True
         self.is_running = True
         logging.debug("UpdateThread Initialized")
@@ -56,10 +58,12 @@ class UpdateThread(QThread):
                 self.stream = capture.VideoStream()
                 continue
 
-            # Change to stream.get_next_frame_raw() for raw Image from camera
-            frame = self.stream.get_next_frame()
+            if self.is_image_processing_demo:
+                frame = self.stream.get_next_frame()
+            else:
+                frame = self.stream.get_next_frame_raw()
 
-            # Piano demo
+            # Piano
             note = self.ai.detect_gesture(frame)
             if self.piano.is_valid_note(note):
                 self.piano.play(note)
@@ -97,7 +101,22 @@ class GUI(QWidget):
         self.inner_layout = QHBoxLayout()
 
         self.lbl_image = QLabel(self)
-        self.lbl_image.resize(520, 360)
+        self.lbl_image.resize(520, 320)
+
+        self.combo_box = QComboBox(self)
+        self.combo_box.addItem("Image processing - Plain")
+        self.combo_box.addItem("Piano - C")
+        self.combo_box.addItem("Piano - C#")
+        self.combo_box.addItem("Piano - D")
+        self.combo_box.addItem("Piano - D#")
+        self.combo_box.addItem("Piano - E")
+        self.combo_box.addItem("Piano - F")
+        self.combo_box.addItem("Piano - F#")
+        self.combo_box.addItem("Piano - G")
+        self.combo_box.addItem("Piano - G#")
+        self.combo_box.addItem("Piano - A")
+        self.combo_box.addItem("Piano - A#")
+        self.combo_box.addItem("Piano - B")
 
         self.lbl_keys = QLabel(self)
         self.lbl_keys.setPixmap(QPixmap("res/keys.png").scaledToWidth(520))
@@ -112,17 +131,27 @@ class GUI(QWidget):
         self.thread = UpdateThread(self)
         self.thread.signal_lbl_cam.connect(self.lbl_image.setPixmap)
         self.thread.signal_lbl_piano.connect(self.lbl_keys.setPixmap)
+        self.combo_box.activated[str].connect(self.combo_box_selection)
         self.thread.start()
 
         self.inner_layout.addWidget(self.lbl_image)
         self.inner_layout.addWidget(self.lbl_keys)
 
         self.layout.addLayout(self.inner_layout)
+        self.layout.addWidget(self.combo_box)
         self.layout.addWidget(logger.widget)
 
         self.setLayout(self.layout)
 
         logging.debug("GUI Initialized")
+
+    def combo_box_selection(self, text):
+        if "Piano - " in text:
+            self.thread.piano.stop()
+            self.thread.piano.play(text.replace("Piano - ", "") + "-1")
+
+        elif text is "Image processing - Plain":
+            self.thread.is_image_processing_demo = not self.thread.is_image_processing_demo
 
     def closeEvent(self, event):
         self.thread.stop()

@@ -55,6 +55,3 @@ class Piano:
 
     def stop(self):
         self.channel.stop()
-
-
-

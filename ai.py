@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 import logging
 
+
 class AI:
     def __init__(self):
         with tf.gfile.FastGFile("res/retrained_graph.pb", 'rb') as f:
@@ -26,15 +27,13 @@ class AI:
 
         # Predictions
         predictions = self.sess.run(self.softmax_tensor, {'Mul:0': tf_final})
-        top_k = predictions[0].argsort()[-len(predictions[0]):][::-1]
 
         # Assign predictions
-        for node_id in top_k:
-            score_pinky = predictions[0][0]
-            score_middle = predictions[0][1]
-            score_ring = predictions[0][2]
-            score_thumb = predictions[0][3]
-            score_index = predictions[0][4]
+        score_pinky = predictions[0][0]
+        score_middle = predictions[0][1]
+        score_ring = predictions[0][2]
+        score_thumb = predictions[0][3]
+        score_index = predictions[0][4]
 
         # Based on score, do something
         if score_index > 0.55:

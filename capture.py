@@ -1,8 +1,5 @@
 import logging
-
 import cv2 as cv
-
-import processing
 
 
 class VideoStream:
@@ -16,7 +13,7 @@ class VideoStream:
     """
     def get_next_frame_raw(self):
         ret, frame = self.cap.read()
-        return frame
+        return cv.flip(frame, 1)
 
     """
         Returns processed image frame
@@ -27,18 +24,11 @@ class VideoStream:
         frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         frame = cv.GaussianBlur(frame, (15, 15), 0)
         _, thresh = cv.threshold(frame, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)
-        thresh = cv.cvtColor(thresh, cv.COLOR_GRAY2BGR)
+        frame = cv.cvtColor(thresh, cv.COLOR_GRAY2BGR)
 
-        frame = cv.flip(thresh, 1)
-        cv.rectangle(frame, (340, 180), (639, 479), (105,187,1), 1)
+        cv.rectangle(frame, (340, 180), (639, 479), (105,187,1), 7)
 
         return frame
-
-        # Filtering
-        # gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-        # blur = cv2.GaussianBlur(gray, (15, 15), 0)
-        # _, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-        # thresh = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
 
     def is_open(self):
         return self.cap.isOpened()
