@@ -104,7 +104,7 @@ class GUI(QWidget):
         self.lbl_image.resize(520, 320)
 
         self.combo_box = QComboBox(self)
-        self.combo_box.addItem("Image processing - Plain")
+        self.combo_box.addItem("Image processing - [Toggle]")
         self.combo_box.addItem("Piano - C")
         self.combo_box.addItem("Piano - C#")
         self.combo_box.addItem("Piano - D")
@@ -150,7 +150,7 @@ class GUI(QWidget):
             self.thread.piano.stop()
             self.thread.piano.play(text.replace("Piano - ", "") + "-1")
 
-        elif text is "Image processing - Plain":
+        elif "Image processing - [Toggle]" in text:
             self.thread.is_image_processing_demo = not self.thread.is_image_processing_demo
 
     def closeEvent(self, event):
